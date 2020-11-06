@@ -123,9 +123,11 @@ _start:
 
 	pushl	$0
 	call	exit
-
+# Essa função serve para que sejam mostrado todos os funcionários
+# cadastrados e suas respectivas informações
 relatorio:
 	movl lista, %eax
+	# verificação de que a lista é nula
 	laco3:
 		cmpl $NULL, %eax
 		je inicio
@@ -258,6 +260,8 @@ relatorio:
 
 
 ler_registro:
+	# Antes que ocorra a alocação de um registro 
+	# pede-se o nome da pessoa
 	pushl 	$pedenome
 	call 	printf
 	addl 	$4, %esp
@@ -267,10 +271,10 @@ ler_registro:
 	call 	gets
 	addl 	$4, %esp
 	
-
+	# No caso de a lista estar vazia 
 	cmpl	$NULL ,lista
 	je		alocaPrimeiro
-
+	# No caso da lista ja ter funcionários
 	jne		alocaOrdenado
 
 alocaOrdenado:
@@ -278,9 +282,12 @@ alocaOrdenado:
 	movl $NULL, %ebx # anterior
 
 	laco:
+		# A lista está vazia
 		cmpl $NULL, %ecx
 		je 	 inserir
 
+		# chamando strcmp 
+		# iterando na lista buscando a posição onde inserir
 		
 		pushl %ebx 
 		pushl %ecx
@@ -335,12 +342,13 @@ alocaPrimeiro:
 	addl $4, %esp
 
 	movl %eax, lista # lista aponta para eax
-	movl $NULL, 261(%eax) # bruxaria: no campo do proximo do novo NULL é setado
+	movl $NULL, 261(%eax) # no campo do proximo do novo NULL é setado
 	incl tamLista
 
 	call ler
 	jmp inicio
 
+# Função de leitrua de dados
 ler:
 	pushl $nomeBuffer 
 	pushl %eax 
@@ -486,7 +494,8 @@ ler:
 
 	ret
 
-
+# Função que recebe um nome digitado e retorna um registro 
+# caso ele exista
 Busca_nome:
 	pushl $nomeBuffer
 	pushl $pedeNomeBusca
@@ -497,7 +506,8 @@ Busca_nome:
 	addl $4, %esp
 
 	movl lista, %edi
-
+	# Lista em EDI iterar para buscar um nome 
+	# Armazena ele em EAX
 	laco2:
 		cmpl $NULL, %edi
 		je naoAchou
@@ -522,7 +532,9 @@ Busca_nome:
 		movl $NULL, %eax
 		ret
 
-
+# ocorre a chamada da função busca nome
+# caso o nome exista o registro relativo ao mesmo ficará salvo em EAX
+# e será mostrado
 mostrar_1_registro:
 	call Busca_nome
 	cmpl $NULL, %eax
@@ -658,7 +670,8 @@ mostrar_1_registro:
 		addl $4, %esp
 		jmp inicio
 	
-
+# função para remover um registro da lista
+# é pedido um nome e ocorre a verificação da existencia do mesmo
 remover_registro:
 	pushl $pedeNomeRemover
 	call printf
@@ -670,9 +683,9 @@ remover_registro:
 
 	addl $4, %esp
 
-	movl lista, %ecx
-	movl $NULL, %ebx
-
+	movl lista, %ecx # tem o atual
+	movl $NULL, %ebx # tem o anterior
+	# busca pelo nome na lista
 	laco4:
 		cmpl $NULL, %ecx
 		je eh_nulo
@@ -694,8 +707,9 @@ remover_registro:
 		movl 261(%ecx), %ecx
 		jmp laco4
 	
+	# função para remover o registro
 	removerAtual:
-		cmpl $NULL, %ebx
+		cmpl $NULL, %ebx # se o registro encontrado for o primeiro a remoção é diferente
 		je removePrimeiro
 
 		movl 261(%ecx), %edx
@@ -705,7 +719,7 @@ remover_registro:
 		call free
 		addl $4,%esp
 		jmp inicio
-
+		# remoção do 1o resgitro da lista
 		removePrimeiro:
 			movl 261(%ecx), %edx
 			movl %edx, lista
@@ -713,12 +727,6 @@ remover_registro:
 			call free
 			addl $4,%esp
 			jmp inicio
-
-
-
-
-
-
 
 sair:
 	pushl $0
